@@ -1,0 +1,325 @@
+openapi: 3.0.0
+info:
+  title: User Authentication API
+  description: API documentation for user registration and login
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local server
+paths:
+  /users:
+    post:
+      summary: Register a new user
+      description: Creates a new user account.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "johndoe@example.com"
+                phone:
+                  type: string
+                  example: "+2348123456789"
+                address:
+                  type: string
+                  example: "123 Street, Lagos"
+                password:
+                  type: string
+                  format: password
+                  example: "strongpassword123"
+              required:
+                - name
+                - email
+                - phone
+                - address
+                - password
+      responses:
+        "201":
+          description: User account created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User account created"
+                  status:
+                    type: string
+                    example: "success"
+        "400":
+          description: Bad request (validation error or user already exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User with this email exists"
+
+  /auth/login:
+    post:
+      summary: Login a user
+      description: Authenticates a user and returns a JWT token.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "johndoe@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "strongpassword123"
+              required:
+                - email
+                - password
+      responses:
+        "202":
+          description: Login successful
+          headers:
+            Authorization:
+              schema:
+                type: string
+                example: "Bearer eyJhbGciOiJIUzI1NiIsInR5..."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Login Successful"
+        "400":
+          description: Bad request (invalid credentials or user not found)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User with this email does not exist"
+        "401":
+          description: Unauthorized (wrong password)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Password is not correct"
+  /products:
+    get:
+      summary: Get all products
+      description: Fetches all available products.
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved all products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "All Products"
+                  status:
+                    type: string
+                    example: "success"
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Product A"
+                        price:
+                          type: number
+                          example: 2500.00
+                        description:
+                          type: string
+                          example: "This is a great product"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+  /carts/{productId}:
+    post:
+      summary: Add a product to the cart
+      description: Adds a product to the user's cart.
+      tags:
+        - Cart
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the product to add
+      responses:
+        "200":
+          description: Product added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product added to cart"
+                  status:
+                    type: string
+                    example: "success"
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+    delete:
+      summary: Remove a product from the cart
+      description: Deletes a product from the user's cart.
+      tags:
+        - Cart
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the product to remove
+      responses:
+        "204":
+          description: Product removed successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+  /payments/initialize:
+    get:
+      summary: Initialize payment
+      description: Calculates total cart price and initializes payment.
+      tags:
+        - Payment
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Payment initialized successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Payment initialized successfully"
+                  data:
+                    type: object
+                    properties:
+                      payment_url:
+                        type: string
+                        example: "https://paymentgateway.com/authorize"
+                      access_code:
+                        type: string
+                        example: "XYZ123"
+                      price:
+                        type: number
+                        example: 5000.00
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+  /payments/verify:
+    get:
+      summary: Complete payment
+      description: Verifies the payment transaction using the reference provided.
+      tags:
+        - Payment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: reference
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The payment reference for verification
+        - name: price
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The amount paid
+      responses:
+        "200":
+          description: Payment verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Payment verified"
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
