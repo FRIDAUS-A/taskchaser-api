@@ -9,4 +9,3 @@ class Forbidden extends CustomError{
   }
 }
 module.exports = { Forbidden }
-
