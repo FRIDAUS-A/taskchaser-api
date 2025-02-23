@@ -137,8 +137,6 @@ paths:
       description: Fetches all available products.
       tags:
         - Products
-      security:
-        - BearerAuth: []
       responses:
         "200":
           description: Successfully retrieved all products
