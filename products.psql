@@ -1,4 +1,13 @@
-INSERT INTO Products (productId, productName, price, createdAt, updatedAt) VALUES
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS "Products" (
+    "productId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "productName" VARCHAR(255) NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
+    "createdAt" TIMESTAMP DEFAULT NOW(),
+    "updatedAt" TIMESTAMP DEFAULT NOW()
+);
+INSERT INTO "Products" ("productId", "productName", "price", "createdAt", "updatedAt") VALUES
 (gen_random_uuid(), 'Product 1', 10.99, NOW(), NOW()),
 (gen_random_uuid(), 'Product 2', 15.49, NOW(), NOW()),
 (gen_random_uuid(), 'Product 3', 7.99, NOW(), NOW()),
