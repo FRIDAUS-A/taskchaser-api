@@ -1,12 +1,12 @@
 const { BadRequest } = require('./bad-request');
 const { CustomError } = require('./custom-error');
 const { Forbidden } = require('./forbidden-request');
-const { UnAuthenticated } = require('./unauthenticated');
+const { Unauthenticated } = require('./unauthenticated');
 
 
 module.exports = {
   BadRequest,
-  UnAuthenticated,
+  Unauthenticated,
   Forbidden,
   CustomError,
 }
