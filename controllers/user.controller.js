@@ -3,6 +3,7 @@ const { hashPassword } = require('../utils');
 const { StatusCodes } = require('http-status-codes');
 const { v4: uuidv4 } = require('uuid');
 const { Users } = require("../models/user.model");
+const { BadRequest } = require('../errors');
 
 const registerUser = async (req, res) => {
   const { name, email, password, phone, address } = req.body;
