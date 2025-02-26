@@ -9,6 +9,7 @@ const app = express();
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
+const logger = require('morgan');
 // const displayRoutes = require('express-routemap');
 const corsOptions = {
   origin: '*', // Allow all origin
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.set('trust proxy', true);
 app.use(helmet());
 app.use(compression());
+app.use(logger('dev'));
 // middleware
 const { notFoundMiddleware } = require('./middleware/not-found');
 const { errorHandlerMiddleware } = require('./middleware/error-handler');
@@ -61,5 +63,8 @@ const start = async () => {
 		console.log(`Server is listening on port ${port}`);
 	})
 }
+if (process.env.NODE_ENV !== 'test') {
+	start();
+}
 
-start();
+module.exports = app;
